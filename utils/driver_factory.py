@@ -21,6 +21,11 @@ from selenium.webdriver.chrome.options import Options
 def get_driver():
     options = webdriver.ChromeOptions()
     options.add_argument("--start-maximized")
+    
+    # Required for GitHub Actions Linux runner
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
 
     # Disable Chrome password manager + leak detection popup
     options.add_experimental_option("prefs", {
