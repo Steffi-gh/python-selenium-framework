@@ -43,9 +43,9 @@ jobs:
     # Install Allure CLI (correct method for Ubuntu 24.04)
     - name: Install Allure CLI
       run: |
-        wget https://github.com/allure-framework/allure2/releases/latest/download/allure-commandline.zip
-        unzip allure-commandline.zip -d allure-cli
-        sudo mv allure-cli /opt/allure
+        wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.29.0.tgz
+        tar -xzf allure-2.29.0.tgz
+        sudo mv allure-2.29.0 /opt/allure
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
     - name: Run tests with Allure
@@ -59,3 +59,9 @@ jobs:
       with:
         name: allure-report
         path: allure-report
+        
+    - name: Deploy Allure Report to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: allure-report
