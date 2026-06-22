@@ -53,8 +53,23 @@ jobs:
       run: pytest --alluredir=allure-results
       continue-on-error: true
 
+    - name: Download previous Allure history
+      run: |
+        git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+        if [ -d "gh-pages/history" ]; then
+          mkdir -p allure-results/history
+          cp -r gh-pages/history allure-results/history
+        fi
+
+
     - name: Generate Allure Report
       run: allure generate allure-results -o allure-report --clean
+
+    - name: Copy history to report
+      run: |
+        if [ -d "allure-results/history" ]; then
+          cp -r allure-results/history allure-report/history
+        fi
 
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4
