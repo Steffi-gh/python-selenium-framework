@@ -23,28 +23,39 @@ jobs:
       run: |
         pip install -r requirements.txt
 
-    - name: Run tests with Allure
+     # Install Chrome
+    - name: Install Google Chrome
       run: |
-        pytest --alluredir=allure-results
+        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        sudo apt-get update
+        sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
 
-    - name: Upload Allure results as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: allure-results
-        path: allure-results
+    # Install ChromeDriver matching Chrome version
+    - name: Install ChromeDriver
+      run: |
+        CHROME_VERSION=$(google-chrome --version | sed 's/Google Chrome //')
+        DRIVER_VERSION=$(curl -s "https://googlechromelabs.github.io/chrome-for-testing/LATEST_RELEASE_${CHROME_VERSION%%.*}")
+        wget https://storage.googleapis.com/chrome-for-testing-public/${DRIVER_VERSION}/linux64/chromedriver-linux64.zip
+        unzip chromedriver-linux64.zip
+        sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
+        sudo chmod +x /usr/bin/chromedriver
 
+    # Install Allure CLI (correct method for Ubuntu 24.04)
     - name: Install Allure CLI
       run: |
-        sudo apt-add-repository ppa:qameta/allure -y
-        sudo apt-get update
-        sudo apt-get install allure -y
+        wget https://github.com/allure-framework/allure2/releases/latest/download/allure-commandline.zip
+        unzip allure-commandline.zip -d allure-cli
+        sudo mv allure-cli /opt/allure
+        sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+    - name: Run tests with Allure
+      run: pytest --alluredir=allure-results
 
     - name: Generate Allure Report
-      run: |
-        allure generate allure-results -o allure-report --clean
+      run: allure generate allure-results -o allure-report --clean
 
-    - name: Deploy Allure Report to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
+    - name: Upload Allure Report Artifact
+      uses: actions/upload-artifact@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: allure-report
+        name: allure-report
+        path: allure-report
