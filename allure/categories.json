@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Product Bugs",
+    "matchedStatuses": ["failed"],
+    "traceRegex": ".*AssertionError.*|.*ElementNotFound.*"
+  },
+  {
+    "name": "Automation Bugs",
+    "matchedStatuses": ["broken"],
+    "traceRegex": ".*NoSuchElementException.*|.*TimeoutException.*|.*StaleElementReferenceException.*"
+  },
+  {
+    "name": "Known Issues",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*KNOWN_ISSUE.*"
+  },
+  {
+    "name": "Flaky Tests",
+    "matchedStatuses": ["failed"],
+    "traceRegex": ".*Flaky.*"
+  }
+]

@@ -1,3 +1,0 @@
-[32mINFO    [0m automation:base_page.py:45 Typing into element: ('id', 'user-name') -> standard_user
-[32mINFO    [0m automation:base_page.py:45 Typing into element: ('id', 'password') -> secret_sauce
-[32mINFO    [0m automation:base_page.py:31 Clicking element: ('id', 'login-button')

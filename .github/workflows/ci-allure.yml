@@ -66,3 +66,8 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: allure-report
+
+    - name: Copy categories.json
+      run: |
+        mkdir -p allure-results
+        cp allure/categories.json allure-results/categories.json

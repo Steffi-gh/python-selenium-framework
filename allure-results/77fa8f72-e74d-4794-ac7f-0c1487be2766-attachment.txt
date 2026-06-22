@@ -1,1 +1,0 @@
-2026-06-22 11:40:02,475 - INFO - Typing into element: ('id', 'user-name') -> standard_user
