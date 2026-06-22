@@ -1,4 +1,5 @@
 selenium
 pytest
-pytest-html
+allure-pytest
+allure-python-commons
 webdriver-manager

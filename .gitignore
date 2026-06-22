@@ -1,5 +1,65 @@
+# -------------------------
+# Python
+# -------------------------
 __pycache__/
-logs/
-reports/
 *.pyc
-.env
+*.pyo
+*.pyd
+*.pdb
+*.pkl
+*.egg-info/
+*.egg
+*.log
+
+# Virtual environment
+venv/
+env/
+ENV/
+.venv/
+
+# IDE settings
+.vscode/
+.idea/
+
+# -------------------------
+# PyTest
+# -------------------------
+.cache/
+.pytest_cache/
+*.pytest_cache/
+
+# PyTest HTML reports
+reports/*.html
+reports/*.xml
+
+# -------------------------
+# Selenium
+# -------------------------
+# Screenshots
+reports/screenshots/
+
+# WebDriver binaries (if downloaded manually)
+drivers/
+chromedriver*
+geckodriver*
+msedgedriver*
+
+# -------------------------
+# Allure
+# -------------------------
+reports/allure-results/
+reports/allure-report/
+allure-report/
+allure-results/
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+
+# -------------------------
+# OS files
+# -------------------------
+.DS_Store
+Thumbs.db
