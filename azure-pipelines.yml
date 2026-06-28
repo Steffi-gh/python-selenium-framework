@@ -32,8 +32,11 @@ steps:
 
 - script: |
     cd $(Build.SourcesDirectory)
-    pytest --maxfail=1 --disable-warnings --alluredir=reports/allure-results
+    export PYTHONPATH=$(Build.SourcesDirectory)
+    echo "Running tests from: $(pwd)"
+    pytest --alluredir=reports/allure-results
   displayName: 'Run tests'
+
 
 - task: PublishBuildArtifacts@1
   inputs:
