@@ -18,6 +18,11 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
+    export PYTHONPATH="$(pwd)"
+    echo "PYTHONPATH set to $PYTHONPATH"
+  displayName: 'Set PYTHONPATH'
+
+- script: |
     pytest --alluredir=reports/allure-results
   displayName: 'Run tests'
 
