@@ -7,7 +7,7 @@ def test_valid_login():
     driver = get_driver()
     driver.get("https://www.saucedemo.com")
     login = LoginPage(driver)
-    login.login("standard_user", "secret_sauc")
+    login.login("standard_user", "secret_sauce")
 #   assert "inventory" in driver.current_url
     inventory = InventoryPage(driver)
     assert inventory.is_loaded()
