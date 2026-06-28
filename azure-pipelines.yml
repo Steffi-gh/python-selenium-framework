@@ -18,9 +18,10 @@ steps:
   displayName: 'Install dependencies'
 
 - script: |
-    export PYTHONPATH="$(pwd)"
-    echo "PYTHONPATH set to $PYTHONPATH"
+    export PYTHONPATH="$(Build.SourcesDirectory)"
+    echo "PYTHONPATH is now: $PYTHONPATH"
   displayName: 'Set PYTHONPATH'
+
 
 - script: |
     echo "Current directory:"
@@ -30,10 +31,14 @@ steps:
   displayName: 'Debug: Show working directory'
 
 - script: |
-    pytest --alluredir=reports/allure-results
+    cd $(Build.SourcesDirectory)
+    pytest --maxfail=1 --disable-warnings --alluredir=reports/allure-results
   displayName: 'Run tests'
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: 'reports/allure-results'
     artifactName: 'allure-results'
+
+
+
