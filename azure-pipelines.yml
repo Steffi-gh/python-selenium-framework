@@ -6,37 +6,22 @@ pool:
 
 steps:
 
-# Step 1 — Checkout code
-- task: Checkout@1
-  displayName: 'Checkout repository'
+- checkout: self
 
-# Step 2 — Install Python
 - task: UsePythonVersion@0
   inputs:
     versionSpec: '3.10'
-  displayName: 'Set Python version'
 
-# Step 3 — Install dependencies
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
-  displayName: 'Install Python dependencies'
+  displayName: 'Install dependencies'
 
-# Step 4 — Run PyTest with Allure
 - script: |
     pytest --alluredir=reports/allure-results
-  displayName: 'Run Selenium Tests'
+  displayName: 'Run tests'
 
-# Step 5 — Publish Allure results as pipeline artifact
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: 'reports/allure-results'
     artifactName: 'allure-results'
-  displayName: 'Publish Allure Results'
-
-# Step 6 — Publish HTML report (if using pytest-html)
-- task: PublishBuildArtifacts@1
-  inputs:
-    pathToPublish: 'reports'
-    artifactName: 'html-report'
-  displayName: 'Publish HTML Report'
