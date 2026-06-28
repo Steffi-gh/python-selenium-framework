@@ -23,6 +23,13 @@ steps:
   displayName: 'Set PYTHONPATH'
 
 - script: |
+    echo "Current directory:"
+    pwd
+    echo "Listing all files:"
+    ls -R
+  displayName: 'Debug: Show working directory'
+
+- script: |
     pytest --alluredir=reports/allure-results
   displayName: 'Run tests'
 
