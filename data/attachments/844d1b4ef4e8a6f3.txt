@@ -1,3 +1,0 @@
-2026-06-28 04:08:54,391 - INFO - Typing into element: ('id', 'user-name') -> standard_user
-2026-06-28 04:08:54,540 - INFO - Typing into element: ('id', 'password') -> secret_sauce
-2026-06-28 04:08:54,674 - INFO - Clicking element: ('id', 'login-button')
