@@ -79,31 +79,33 @@ jobs:
           mkdir -p final-results/history
           cp -r gh-pages/history/* final-results/history/
         fi
-        
-# CRITICAL FIX: Inject environment metadata and merge uniquely
-    - name: Merge Allure Results & Inject Metadata
+
+# FIX: Keep results separated in subfolders so they don't overwrite each other
+    - name: Prepare Unique Allure Results & Inject Metadata
       run: |
-        mkdir -p final-results
+        mkdir -p final-results-merged
         
-        # Loop over each browser's result folder
         for dir in merged-results/allure-results-*; do
           if [ -d "$dir" ]; then
-            # Extract the browser name (e.g., chrome, firefox, edge) from the folder name
             BROWSER_NAME=$(basename "$dir" | sed 's/allure-results-//')
             
-            # 1. Create a unique environment file for this browser's results
+            # Inject metadata directly into each browser's specific directory
             echo "Browser=${BROWSER_NAME}" > "$dir/environment.properties"
             echo "Environment=GitHub Actions CI" >> "$dir/environment.properties"
-            
-            # 2. Create a unique executor file so Allure treats them as distinct runs
             echo "{\"name\":\"${BROWSER_NAME^^} Execution\",\"type\":\"github\",\"buildName\":\"Run #${{ github.run_number }} - ${BROWSER_NAME}\"}" > "$dir/executor.json"
             
-            # Copy contents into the final results folder
-            cp -r "$dir"/* final-results/
+            # Move the entire unique folder into our staging area
+            cp -r "$dir" final-results-merged/
           fi
         done
 
-    # CRITICAL FIX: Install Allure CLI on THIS runner machine so the command exists
+        # Copy the history trend data into the staging area root if it exists
+        if [ -d "final-results/history" ]; then
+          mkdir -p final-results-merged/history
+          cp -r final-results/history/* final-results-merged/history/
+        fi
+
+    # Install Allure CLI on this runner machine
     - name: Install Allure CLI
       run: |
         wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz
@@ -111,9 +113,9 @@ jobs:
         sudo mv allure-2.29.0 /opt/allure
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-    # Generate final Allure report
-    - name: Generate Allure Report
-      run: allure generate final-results -o allure-report --clean
+    # FIX: Pass the wild-card directory path so Allure processes all browser folders safely
+    - name: Generate Final Merged Allure Report
+      run: allure generate final-results-merged/* -o allure-report --clean
 
     # Upload final report
     - name: Upload Allure Report Artifact
