@@ -27,36 +27,11 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    - name: Check Python environment
-      run: |
-        python --version
-        which python
-        python -m pip --version
-        python -m pip list | grep -i selenium || true
-        python -c "import selenium; print('Selenium:', selenium.__version__)"
-
     - name: Browser versions
       run: |
         google-chrome --version || true
         firefox --version || true
         microsoft-edge --version || true
-
-    # Install Allure CLI
-    - name: Install Allure CLI
-      run: |
-        wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.zip
-        unzip allure-2.29.0.zip
-        sudo mv allure-2.29.0 /opt/allure
-        sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-
-    - name: Test Firefox directly
-      run: |
-        firefox --headless --version
-        firefox --headless &
-        sleep 5
-        ps -ef | grep firefox || true
-        pkill firefox || true
-
 
     # Run tests for each browser (parallel execution)
     - name: Run tests on ${{ matrix.browser }}
@@ -90,7 +65,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    # Download all browser artifacts
+    # Download all browser artifacts into distinct subdirectories
     - name: Download Allure Results
       uses: actions/download-artifact@v4
       with:
@@ -99,24 +74,30 @@ jobs:
     # Download previous history
     - name: Download previous Allure history
       run: |
-        git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
+        git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages || true
         if [ -d "gh-pages/history" ]; then
-          mkdir -p merged-results/history
-          cp -r gh-pages/history/* merged-results/history/
+          mkdir -p final-results/history
+          cp -r gh-pages/history/* final-results/history/
         fi
 
-    # Merge all browser results dynamically
+    # Merge all browser results dynamically into final-results folder
     - name: Merge Allure Results
       run: |
         mkdir -p final-results
-        # Copy history
-        if [ -d "merged-results/history" ]; then
-          cp -r merged-results/history final-results/history
-        fi
-        # Merge all browser folders
-        for dir in merged-results/*; do
-          cp -r "$dir"/* final-results/ || true
+        # Explicitly find and copy contents of allure-results-* folders to avoid touching the history folder
+        for dir in merged-results/allure-results-*; do
+          if [ -d "$dir" ]; then
+            cp -r "$dir"/* final-results/
+          fi
         done
+
+    # CRITICAL FIX: Install Allure CLI on THIS runner machine so the command exists
+    - name: Install Allure CLI
+      run: |
+        wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.tgz
+        tar -zxvf allure-2.29.0.tgz
+        sudo mv allure-2.29.0 /opt/allure
+        sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
     # Generate final Allure report
     - name: Generate Allure Report
