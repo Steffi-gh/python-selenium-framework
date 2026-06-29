@@ -49,6 +49,9 @@ def _chrome_options():
 def _firefox_options():
     options = webdriver.FirefoxOptions()
     options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
     return options
 
 
