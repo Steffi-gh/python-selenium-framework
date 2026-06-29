@@ -1,0 +1,12 @@
+INFO     automation:base_page.py:45 Typing into element: ('id', 'user-name') -> standard_user
+INFO     automation:base_page.py:45 Typing into element: ('id', 'password') -> secret_sauce
+INFO     automation:base_page.py:31 Clicking element: ('id', 'login-button')
+INFO     automation:base_page.py:31 Clicking element: ('id', 'add-to-cart-sauce-labs-backpack')
+INFO     automation:base_page.py:31 Clicking element: ('class name', 'shopping_cart_link')
+INFO     automation:base_page.py:31 Clicking element: ('id', 'checkout')
+INFO     automation:base_page.py:45 Typing into element: ('id', 'first-name') -> Steffi
+INFO     automation:base_page.py:45 Typing into element: ('id', 'last-name') -> QA
+INFO     automation:base_page.py:45 Typing into element: ('id', 'postal-code') -> 2000
+INFO     automation:base_page.py:31 Clicking element: ('id', 'continue')
+INFO     automation:base_page.py:31 Clicking element: ('id', 'finish')
+INFO     automation:base_page.py:59 Getting text from element: ('class name', 'complete-header')
