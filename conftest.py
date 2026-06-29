@@ -1,31 +1,38 @@
-import pytest
+import time
 import shutil
-from utils.driver_factory import get_driver
+import pytest
 import allure
+
+from utils.driver_factory import get_driver
 
 
 def pytest_addoption(parser):
-    parser.addoption("--browser", action="store", default="chrome")
+    parser.addoption(
+        "--browser",
+        action="store",
+        default="chrome"
+    )
 
-
-import time
 
 @pytest.fixture
 def driver(request):
+
     browser = request.config.getoption("--browser")
 
-    # try a couple of times to create the driver
-    last_exc = None
+    last_exception = None
+
     for attempt in range(2):
         try:
             driver = get_driver(browser)
             break
+
         except Exception as e:
-            last_exc = e
-            time.sleep(3)
+            print(f"Attempt {attempt + 1} failed: {e}")
+            last_exception = e
+            time.sleep(5)
+
     else:
-        # re-raise the last exception so pytest records setup failure
-        raise last_exc
+        raise last_exception
 
     yield driver
 
@@ -38,22 +45,24 @@ def driver(request):
         shutil.rmtree(driver.temp_profile, ignore_errors=True)
 
 
-
-# Attach screenshots for ANY failure (setup, call, teardown)
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
+
     outcome = yield
-    rep = outcome.get_result()
+    report = outcome.get_result()
 
-    if rep.failed:
-        driver = item.funcargs.get("driver", None)
+    if report.failed:
 
-        if driver and hasattr(driver, "get_screenshot_as_png"):
+        driver = item.funcargs.get("driver")
+
+        if driver:
+
             try:
                 allure.attach(
                     driver.get_screenshot_as_png(),
-                    name=f"{rep.when}_screenshot",
-                    attachment_type=allure.attachment_type.PNG
+                    name=f"{report.when}_failure",
+                    attachment_type=allure.attachment_type.PNG,
                 )
+
             except Exception:
                 pass
