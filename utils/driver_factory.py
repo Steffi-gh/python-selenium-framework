@@ -71,11 +71,15 @@ def get_driver(browser="chrome"):
     elif browser == "firefox":
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless")
+        firefox_options.add_argument("--no-sandbox")
+        firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
+        # CI stability fixes
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.tabs.remote.autostart", False)
-
+        firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
+        firefox_options.set_preference("dom.ipc.processCount", 1)
 
         return webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
