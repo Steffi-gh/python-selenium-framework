@@ -1,3 +1,5 @@
+
+import os
 import tempfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -49,41 +51,31 @@ def get_driver(browser="chrome", profile_path=None):
         )
 
     elif browser == "firefox":
-        from selenium.webdriver.firefox.service import Service as FirefoxService
-        from webdriver_manager.firefox import GeckoDriverManager
+        # CRITICAL FIX 1: Set Linux environment variables to disable Firefox's 
+        # internal sandboxing, preventing silent freezes on GitHub Actions container environments.
+        os.environ["MOZ_DISABLE_CONTENT_SANDBOX"] = "1"
+        os.environ["MOZ_NODE_PATH"] = "/tmp"
 
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless") 
-        firefox_options.add_argument("--no-sandbox")
-        firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
 
         if profile_path:
             firefox_options.add_argument(f"--profile={profile_path}")
 
-        # Stability preferences
+        # CRITICAL FIX 2: Correctly pass preferences that stop memory thrashing and crash loops
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
         
-        # Instantiate Firefox normally
-        driver = webdriver.Firefox(
-            service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options
-        )
+        # Disable hardware acceleration and large memory hooks inside the preferences engine
+        firefox_options.set_preference("layers.acceleration.disabled", True)
+        firefox_options.set_preference("gfx.webrender.software", True)
 
-        # FIX: Modify the internal request connection timeout safely after creation.
-        # This gives your parallel worker 300 seconds to navigate file locks 
-        # without running into Selenium version import errors.
-        try:
-            if hasattr(driver.command_executor, '_client_config'):
-                driver.command_executor._client_config.timeout = 300
-            elif hasattr(driver.command_executor, 'client_config'):
-                driver.command_executor.client_config.timeout = 300
-        except Exception:
-            pass 
-
-        return driver
+        # CRITICAL FIX 3: Since you are on Selenium 4.45, leverage Selenium's integrated, 
+        # native binary handling. Omitting a raw Service instance bypasses third-party 
+        # manager initialization hangs entirely.
+        return webdriver.Firefox(options=firefox_options)
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
