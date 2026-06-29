@@ -112,12 +112,13 @@ jobs:
           libcairo2 \
           libgdk-pixbuf-2.0-0 \
           libasound2t64
-          
+
     - name: Install Firefox sandbox dependencies
       run: |
+        sudo apt-get update
         sudo apt-get install -y \
           libevent-2.1-7 \
-          libvpx7 \
+          libvpx8 \
           libavcodec-extra
 
     # Run tests for each browser (parallel execution)
