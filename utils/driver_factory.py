@@ -44,16 +44,20 @@ def get_driver(browser: str, profile_path: str = None):
     # -----------------------------
     elif browser == "firefox":
         import os
+        import tempfile
+        from selenium import webdriver
         from selenium.webdriver.firefox.service import Service as FirefoxService
+        from selenium.webdriver.firefox.remote_connection import FirefoxRemoteConnection
         from webdriver_manager.firefox import GeckoDriverManager
 
-        log_path = f"/tmp/geckodriver-{os.getpid()}.log"
-        service = FirefoxService(GeckoDriverManager().install(), log_path=log_path)
+        # increase HTTP/command timeout (seconds) before creating the driver
+        FirefoxRemoteConnection.set_timeout(180)
 
         # Create a fresh profile per test (critical for CI stability)
         temp_profile = tempfile.mkdtemp()
         firefox_options = webdriver.FirefoxOptions()
 
+        # Standard headless mode for Firefox
         firefox_options.add_argument("--headless")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
@@ -70,22 +74,27 @@ def get_driver(browser: str, profile_path: str = None):
         firefox_options.set_preference("browser.tabs.remote.separatePrivilegedJavaScriptProcess", False)
         firefox_options.set_preference("dom.ipc.processCount", 1)
 
-        # CI stability
+        # CI stability preferences
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
 
-        driver = webdriver.Firefox(
-            service=service,
-            options=firefox_options,
-            # timeout increases the time to wait for the driver to start/respond
-            timeout=180
-        )
+        # geckodriver log path and service
+        log_path = f"/tmp/geckodriver-{os.getpid()}.log"
+        service = FirefoxService(GeckoDriverManager().install(), log_path=log_path)
 
-        # attach path so fixture/CI can upload it on failure
+        # Create the driver (do NOT pass timeout= here)
+        driver = webdriver.Firefox(service=service, options=firefox_options)
+
+        # Session-level timeouts
+        driver.set_page_load_timeout(120)   # seconds
+        driver.implicitly_wait(5)           # seconds
+
+        # Attach debug info and cleanup info to the driver object
         driver.geckodriver_log = log_path
-        # Attach cleanup path to driver so fixture can delete it
         driver.temp_profile = temp_profile
+
         return driver
+
 
     # -----------------------------
     # EDGE (CI-safe)
