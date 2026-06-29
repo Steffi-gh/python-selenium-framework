@@ -1,1 +1,1 @@
-[{"uid":"e864628cc1236497","name":"test_checkout_flow","time":{"start":1782701910088,"stop":1782702030184,"duration":120096},"status":"passed","severity":"normal"}]
+[{"uid":"8bfcdb0937b4f90d","name":"test_checkout_flow","time":{"start":1782702528557,"stop":1782702528557,"duration":0},"status":"broken","severity":"normal"},{"uid":"f06183cc08888f77","name":"test_valid_login","time":{"start":1782702661009,"stop":1782702664050,"duration":3041},"status":"passed","severity":"normal"}]
