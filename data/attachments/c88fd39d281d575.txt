@@ -1,0 +1,4 @@
+2026-06-29 11:11:22,160 - INFO - Typing into element: ('id', 'user-name') -> standard_user
+2026-06-29 11:11:22,356 - INFO - Typing into element: ('id', 'password') -> secret_sauce
+2026-06-29 11:11:22,469 - INFO - Clicking element: ('id', 'login-button')
+2026-06-29 11:11:22,642 - INFO - Clicking element: ('id', 'add-to-cart-sauce-labs-backpack')
