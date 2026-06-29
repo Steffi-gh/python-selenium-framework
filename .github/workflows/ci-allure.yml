@@ -63,12 +63,12 @@ jobs:
         fi
       continue-on-error: true
 
-      - name: Upload geckodriver log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: geckodriver-log-${{ matrix.browser }}
-          path: geckodriver.log
+    - name: Upload geckodriver log
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: geckodriver-log-${{ matrix.browser }}
+        path: geckodriver.log
 
     # Upload per-browser Allure results
     - name: Upload Allure Results
