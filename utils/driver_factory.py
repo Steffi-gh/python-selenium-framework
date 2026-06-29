@@ -83,16 +83,18 @@ def get_driver(browser="chrome"):
         )
 
     elif browser == "edge":
+        from webdriver_manager.microsoft import EdgeChromiumDriverManager
         edge_options = webdriver.EdgeOptions()
         edge_options.add_argument("--headless=new")
-        edge_options.add_argument("--start-maximized")
         edge_options.add_argument("--disable-gpu")
-
+        edge_options.add_argument("--no-sandbox")
+        edge_options.add_argument("--disable-dev-shm-usage")
 
         return webdriver.Edge(
             service=EdgeService(EdgeChromiumDriverManager().install()),
             options=edge_options
         )
+
 
     else:
         raise Exception(f"Browser '{browser}' is not supported")

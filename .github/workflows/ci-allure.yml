@@ -44,18 +44,6 @@ jobs:
         sudo mv geckodriver /usr/bin/geckodriver
         sudo chmod +x /usr/bin/geckodriver
 
-    - name: Install EdgeDriver
-      run: |
-        sudo apt-get install -y microsoft-edge-stable
-        EDGE_VERSION=$(microsoft-edge --version | awk '{print $3}')
-        DRIVER_VERSION=$(curl -s "https://msedgedriver.azureedge.net/LATEST_RELEASE_$EDGE_VERSION")
-        wget https://msedgedriver.azureedge.net/$DRIVER_VERSION/edgedriver_linux64.zip
-        unzip edgedriver_linux64.zip
-        sudo mv msedgedriver /usr/bin/msedgedriver
-        sudo chmod +x /usr/bin/msedgedriver
-
-        
-
      # Install Chrome
     - name: Install Google Chrome
       run: |
