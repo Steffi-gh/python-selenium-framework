@@ -1,26 +1,8 @@
-#This ensures:
-#No manual driver downloads
-#Chrome auto‑updates
-#Tests run on any machine
-
-#from selenium import webdriver
-#from webdriver_manager.chrome import ChromeDriverManager
-
-#def get_driver():
-#    options = webdriver.ChromeOptions()
-#    options.add_argument("--start-maximized")
-#    driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-#    return driver
-
-
+import tempfile
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-
 from selenium.webdriver.edge.service import Service as EdgeService
-
 from webdriver_manager.chrome import ChromeDriverManager
-
-import tempfile
 
 def get_driver(browser="chrome", profile_path=None):
     browser = browser.lower()
@@ -34,7 +16,6 @@ def get_driver(browser="chrome", profile_path=None):
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
     chrome_options.add_argument("--disable-gpu")
-
 
     # Disable Chrome password manager + leak detection popup
     chrome_options.add_experimental_option("prefs", {
@@ -67,40 +48,34 @@ def get_driver(browser="chrome", profile_path=None):
             options=chrome_options
         )
 
-
-
     elif browser == "firefox":
         from selenium.webdriver.firefox.service import Service as FirefoxService
         from webdriver_manager.firefox import GeckoDriverManager
+        from selenium.webdriver.common.client_config import ClientConfig
 
         firefox_options = webdriver.FirefoxOptions()
-        firefox_options.add_argument("--headless=new")
+        firefox_options.add_argument("--headless") # Clean, stable headless flag
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
 
-        # Use ONLY the fresh profile
-        firefox_options.add_argument(f"--profile={profile_path}")
+        # Only inject a profile if a valid path is passed down and populated
+        if profile_path:
+            firefox_options.add_argument(f"--profile={profile_path}")
 
-        # CI stability fixes
-        firefox_options.set_preference("browser.tabs.remote.autostart", False)
-        firefox_options.set_preference("browser.tabs.remote.autostart.1", False)
-        firefox_options.set_preference("browser.tabs.remote.autostart.2", False)
-        firefox_options.set_preference("browser.tabs.remote.force-enable", False)
-        firefox_options.set_preference("browser.tabs.remote.separatePrivilegedContentProcess", False)
-        firefox_options.set_preference("browser.tabs.remote.separatePrivilegedJavaScriptProcess", False)
-        firefox_options.set_preference("dom.ipc.processCount", 1)
+        # Basic infrastructure stability adjustments for CI
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
+        
+        # FIX: Give the driver connection up to 300 seconds to build the session on slow GitHub nodes
+        custom_config = ClientConfig(timeout=300)
 
         return webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options
+            options=firefox_options,
+            client_config=custom_config
         )
-
-
-
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
@@ -114,7 +89,6 @@ def get_driver(browser="chrome", profile_path=None):
             service=EdgeService(EdgeChromiumDriverManager().install()),
             options=edge_options
         )
-
 
     else:
         raise Exception(f"Browser '{browser}' is not supported")

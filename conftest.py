@@ -1,24 +1,21 @@
 import pytest
 import allure
 from utils.driver_factory import get_driver
-import tempfile
-import shutil
-
-import pytest
-from utils.driver_factory import get_driver
 
 @pytest.fixture
 def driver(request):
     browser = request.config.getoption("--browser")
 
-    temp_profile = tempfile.mkdtemp()
-    driver = get_driver(browser, temp_profile)
+    # Let Selenium handle the profile automatically by passing None
+    driver = get_driver(browser, profile_path=None)
 
     yield driver
 
-    driver.quit()
-    shutil.rmtree(temp_profile, ignore_errors=True)
-
+    # Safe teardown
+    try:
+        driver.quit()
+    except Exception:
+        pass
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
