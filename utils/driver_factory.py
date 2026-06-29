@@ -51,16 +51,14 @@ def get_driver(browser="chrome", profile_path=None):
     elif browser == "firefox":
         from selenium.webdriver.firefox.service import Service as FirefoxService
         from webdriver_manager.firefox import GeckoDriverManager
-        from selenium.webdriver.common.client_config import ClientConfig
 
         firefox_options = webdriver.FirefoxOptions()
-        firefox_options.add_argument("--headless") # Clean, stable headless flag
+        firefox_options.add_argument("--headless") 
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
 
-        # Only inject a profile if a valid path is passed down and populated
         if profile_path:
             firefox_options.add_argument(f"--profile={profile_path}")
 
@@ -68,14 +66,23 @@ def get_driver(browser="chrome", profile_path=None):
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
         
-        # FIX: Give the driver connection up to 300 seconds to build the session on slow GitHub nodes
-        custom_config = ClientConfig(timeout=300)
-
-        return webdriver.Firefox(
+        # Instantiate Firefox
+        driver = webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options,
-            client_config=custom_config
+            options=firefox_options
         )
+
+        # FIX: Backward/forward compatible way to increase HTTP connection timeouts 
+        # to 300 seconds across all Selenium 4.x versions without requiring specific imports.
+        try:
+            if hasattr(driver.command_executor, 'client_config'):
+                driver.command_executor.client_config.timeout = 300
+            else:
+                driver.command_executor.set_timeout(300)
+        except Exception:
+            pass # Fallback safety if the runner uses an alternative setup context
+
+        return driver
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager

@@ -78,7 +78,7 @@ jobs:
 
     # Run tests for each browser
     - name: Run tests on ${{ matrix.browser }}
-      run: pytest --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
+      run: pytest -n auto --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
       continue-on-error: true
 
    # Download previous Allure history
