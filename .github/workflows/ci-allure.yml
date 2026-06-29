@@ -27,6 +27,14 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
+    - name: Check Python environment
+      run: |
+        python --version
+        which python
+        python -m pip --version
+        python -m pip list | grep -i selenium || true
+        python -c "import selenium; print('Selenium:', selenium.__version__)"
+
     - name: Install Browsers
       run: |
         sudo apt-get update
@@ -46,6 +54,14 @@ jobs:
         unzip allure-2.29.0.zip
         sudo mv allure-2.29.0 /opt/allure
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+    - name: Test Firefox directly
+      run: |
+        firefox --headless --version
+        firefox --headless &
+        sleep 5
+        ps -ef | grep firefox || true
+        pkill firefox || true
 
 
     # Run tests for each browser (parallel execution)
