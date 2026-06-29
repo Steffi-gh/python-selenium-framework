@@ -54,8 +54,14 @@ def _firefox_options():
 
 def _edge_options():
     options = webdriver.EdgeOptions()
-    options.add_argument("--headless=new")
+    options.use_chromium = True
+
+    # Correct headless mode for Edge (Chrome-style flags break Edge)
+    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
     return options
 
 
