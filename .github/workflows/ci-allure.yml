@@ -79,14 +79,26 @@ jobs:
           mkdir -p final-results/history
           cp -r gh-pages/history/* final-results/history/
         fi
-
-    # Merge all browser results dynamically into final-results folder
-    - name: Merge Allure Results
+        
+# CRITICAL FIX: Inject environment metadata and merge uniquely
+    - name: Merge Allure Results & Inject Metadata
       run: |
         mkdir -p final-results
-        # Explicitly find and copy contents of allure-results-* folders to avoid touching the history folder
+        
+        # Loop over each browser's result folder
         for dir in merged-results/allure-results-*; do
           if [ -d "$dir" ]; then
+            # Extract the browser name (e.g., chrome, firefox, edge) from the folder name
+            BROWSER_NAME=$(basename "$dir" | sed 's/allure-results-//')
+            
+            # 1. Create a unique environment file for this browser's results
+            echo "Browser=${BROWSER_NAME}" > "$dir/environment.properties"
+            echo "Environment=GitHub Actions CI" >> "$dir/environment.properties"
+            
+            # 2. Create a unique executor file so Allure treats them as distinct runs
+            echo "{\"name\":\"${BROWSER_NAME^^} Execution\",\"type\":\"github\",\"buildName\":\"Run #${{ github.run_number }} - ${BROWSER_NAME}\"}" > "$dir/executor.json"
+            
+            # Copy contents into the final results folder
             cp -r "$dir"/* final-results/
           fi
         done
