@@ -15,15 +15,14 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
+
 from selenium.webdriver.edge.service import Service as EdgeService
 
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
+import tempfile
 
-def get_driver(browser="chrome"):
+def get_driver(browser="chrome", profile_path=None):
     browser = browser.lower()
 
     # -----------------------------
@@ -68,6 +67,8 @@ def get_driver(browser="chrome"):
             options=chrome_options
         )
 
+
+
     elif browser == "firefox":
         from selenium.webdriver.firefox.service import Service as FirefoxService
         from webdriver_manager.firefox import GeckoDriverManager
@@ -79,7 +80,10 @@ def get_driver(browser="chrome"):
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
 
-        # REQUIRED for GitHub Actions stability
+        # Use ONLY the fresh profile
+        firefox_options.add_argument(f"--profile={profile_path}")
+
+        # CI stability fixes
         firefox_options.set_preference("browser.tabs.remote.autostart", False)
         firefox_options.set_preference("browser.tabs.remote.autostart.1", False)
         firefox_options.set_preference("browser.tabs.remote.autostart.2", False)
@@ -94,6 +98,8 @@ def get_driver(browser="chrome"):
             service=FirefoxService(GeckoDriverManager().install()),
             options=firefox_options
         )
+
+
 
 
     elif browser == "edge":
