@@ -51,8 +51,6 @@ def get_driver(browser="chrome", profile_path=None):
     elif browser == "firefox":
         from selenium.webdriver.firefox.service import Service as FirefoxService
         from webdriver_manager.firefox import GeckoDriverManager
-        # Correct path for modern Selenium 4.20+ / 4.45+
-        from selenium.webdriver.remote.client_config import ClientConfig
 
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless") 
@@ -68,15 +66,24 @@ def get_driver(browser="chrome", profile_path=None):
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
         
-        # FIX: Define the 300s timeout object directly for the underlying HTTP client
-        # This will bypass the 120-second limitation during concurrent file locks.
-        ff_config = ClientConfig(timeout=300)
-
-        return webdriver.Firefox(
+        # Instantiate Firefox normally
+        driver = webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options,
-            client_config=ff_config
+            options=firefox_options
         )
+
+        # FIX: Modify the internal request connection timeout safely after creation.
+        # This gives your parallel worker 300 seconds to navigate file locks 
+        # without running into Selenium version import errors.
+        try:
+            if hasattr(driver.command_executor, '_client_config'):
+                driver.command_executor._client_config.timeout = 300
+            elif hasattr(driver.command_executor, 'client_config'):
+                driver.command_executor.client_config.timeout = 300
+        except Exception:
+            pass 
+
+        return driver
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
