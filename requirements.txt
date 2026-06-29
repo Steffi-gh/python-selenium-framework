@@ -3,4 +3,3 @@ pytest
 allure-pytest
 allure-python-commons
 webdriver-manager
-pytest-xdist
