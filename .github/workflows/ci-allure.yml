@@ -64,9 +64,14 @@ jobs:
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
 
-    # Install Firefox
-    - name: Install Firefox
+    - name: Install Firefox (Ubuntu 24.04)
       run: |
+        sudo add-apt-repository -y ppa:mozillateam/ppa
+        echo '
+        Package: *
+        Pin: release o=LP-PPA-mozillateam
+        Pin-Priority: 1001
+        ' | sudo tee /etc/apt/preferences.d/mozilla-firefox
         sudo apt-get update
         sudo apt-get install -y firefox
 
@@ -115,10 +120,23 @@ jobs:
 
     - name: Install Firefox sandbox dependencies
       run: |
-        sudo apt-get update
         sudo apt-get install -y \
-          libevent-2.1-7 \
-          libvpx8 \
+          libgtk-3-0 \
+          libdbus-glib-1-2 \
+          libxt6 \
+          libxss1 \
+          libnss3 \
+          libxrandr2 \
+          libxdamage1 \
+          libxcomposite1 \
+          libxfixes3 \
+          libxkbcommon0 \
+          libpango-1.0-0 \
+          libpangocairo-1.0-0 \
+          libatk1.0-0 \
+          libcairo2 \
+          libgdk-pixbuf-2.0-0 \
+          libasound2t64 \
           libavcodec-extra
 
     # Run tests for each browser (parallel execution)
