@@ -1,7 +1,0 @@
-2026-06-29 10:48:54,201 - INFO - Typing into element: ('id', 'user-name') -> standard_user
-2026-06-29 10:48:54,477 - INFO - Typing into element: ('id', 'password') -> secret_sauce
-2026-06-29 10:48:54,578 - INFO - Clicking element: ('id', 'login-button')
-2026-06-29 10:48:54,800 - INFO - Clicking element: ('id', 'add-to-cart-sauce-labs-backpack')
-2026-06-29 10:48:54,941 - INFO - Clicking element: ('class name', 'shopping_cart_link')
-2026-06-29 10:48:55,082 - INFO - Clicking element: ('id', 'checkout')
-2026-06-29 10:48:55,215 - INFO - Typing into element: ('id', 'first-name') -> Steffi
