@@ -24,6 +24,8 @@ def _chrome_options():
         "--disable-features=PasswordLeakDetection,PasswordManagerOnboarding"
     )
 
+    options.add_argument("--window-size=1920,1080")
+
     return options
 
 
@@ -34,6 +36,9 @@ def _firefox_options():
 
     options.set_preference("remote.active-protocols", 1)
 
+    options.add_argument("--width=1920")
+    options.add_argument("--height=1080")
+
     return options
 
 
@@ -43,6 +48,7 @@ def _edge_options():
     options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--window-size=1920,1080")
 
     return options
 
@@ -61,6 +67,7 @@ def get_driver(browser: str):
         service = FirefoxService(
             log_output="geckodriver.log"
         )
+        service.service_args = ["--log", "debug"]
 
         driver = webdriver.Firefox(
             service=service,
@@ -75,6 +82,6 @@ def get_driver(browser: str):
     else:
         raise ValueError(f"Unsupported browser: {browser}")
 
-    driver.maximize_window()
+    
 
     return driver

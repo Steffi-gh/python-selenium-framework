@@ -27,22 +27,17 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    - name: Install browsers
+    - name: Install Browsers
       run: |
         sudo apt-get update
+        sudo apt-get install -y firefox
+        sudo apt-get install -y microsoft-edge-stable || true
 
-        wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-        sudo apt install -y ./google-chrome-stable_current_amd64.deb
-
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo gpg --dearmor -o /usr/share/keyrings/microsoft.gpg
-
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
-
-        sudo apt update
-
-        sudo apt install -y \
-          microsoft-edge-stable \
-          firefox-esr
+    - name: Browser versions
+      run: |
+        google-chrome --version || true
+        firefox --version || true
+        microsoft-edge --version || true
 
     # Install Allure CLI
     - name: Install Allure CLI
