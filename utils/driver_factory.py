@@ -51,6 +51,8 @@ def get_driver(browser="chrome", profile_path=None):
     elif browser == "firefox":
         from selenium.webdriver.firefox.service import Service as FirefoxService
         from webdriver_manager.firefox import GeckoDriverManager
+        # Correct path for modern Selenium 4.20+ / 4.45+
+        from selenium.webdriver.remote.client_config import ClientConfig
 
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless") 
@@ -62,27 +64,19 @@ def get_driver(browser="chrome", profile_path=None):
         if profile_path:
             firefox_options.add_argument(f"--profile={profile_path}")
 
-        # Basic infrastructure stability adjustments for CI
+        # Stability preferences
         firefox_options.set_preference("network.proxy.type", 0)
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
         
-        # Instantiate Firefox
-        driver = webdriver.Firefox(
+        # FIX: Define the 300s timeout object directly for the underlying HTTP client
+        # This will bypass the 120-second limitation during concurrent file locks.
+        ff_config = ClientConfig(timeout=300)
+
+        return webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options
+            options=firefox_options,
+            client_config=ff_config
         )
-
-        # FIX: Backward/forward compatible way to increase HTTP connection timeouts 
-        # to 300 seconds across all Selenium 4.x versions without requiring specific imports.
-        try:
-            if hasattr(driver.command_executor, 'client_config'):
-                driver.command_executor.client_config.timeout = 300
-            else:
-                driver.command_executor.set_timeout(300)
-        except Exception:
-            pass # Fallback safety if the runner uses an alternative setup context
-
-        return driver
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
