@@ -47,11 +47,7 @@ def get_driver(browser: str, profile_path: str = None):
         import tempfile
         from selenium import webdriver
         from selenium.webdriver.firefox.service import Service as FirefoxService
-        from selenium.webdriver.firefox.remote_connection import FirefoxRemoteConnection
         from webdriver_manager.firefox import GeckoDriverManager
-
-        # increase HTTP/command timeout (seconds) before creating the driver
-        FirefoxRemoteConnection.set_timeout(180)
 
         # Create a fresh profile per test (critical for CI stability)
         temp_profile = tempfile.mkdtemp()
@@ -89,12 +85,32 @@ def get_driver(browser: str, profile_path: str = None):
         driver.set_page_load_timeout(120)   # seconds
         driver.implicitly_wait(5)           # seconds
 
+        # Try to set the HTTP/command timeout in a compatible way
+        # 1) If the driver has a command_executor with a writable internal timeout attribute, set it
+        try:
+            # common internal attribute used by many Selenium versions
+            if hasattr(driver, "command_executor") and hasattr(driver.command_executor, "_conn_timeout"):
+                driver.command_executor._conn_timeout = 180
+            # some Selenium versions expose a set_timeout method on the executor
+            elif hasattr(driver, "command_executor") and hasattr(driver.command_executor, "set_timeout"):
+                try:
+                    driver.command_executor.set_timeout(180)
+                except Exception:
+                    pass
+            # last resort: try to set a client config on the remote connection class (some versions)
+            else:
+                from selenium.webdriver.firefox.remote_connection import FirefoxRemoteConnection
+                if hasattr(FirefoxRemoteConnection, "_client_config") and isinstance(FirefoxRemoteConnection._client_config, dict):
+                    FirefoxRemoteConnection._client_config["timeout"] = 180
+        except Exception:
+            # don't fail driver creation just because we couldn't set the HTTP timeout
+            pass
+
         # Attach debug info and cleanup info to the driver object
         driver.geckodriver_log = log_path
         driver.temp_profile = temp_profile
 
         return driver
-
 
     # -----------------------------
     # EDGE (CI-safe)
