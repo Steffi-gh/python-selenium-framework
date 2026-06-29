@@ -2,9 +2,14 @@ import pytest
 import allure
 from utils.driver_factory import get_driver
 
+
+import pytest
+from utils.driver_factory import get_driver
+
 @pytest.fixture
-def driver():
-    driver = get_driver()
+def driver(request):
+    browser = request.config.getoption("--browser")
+    driver = get_driver(browser)
     yield driver
     driver.quit()
 
@@ -21,3 +26,6 @@ def pytest_runtest_makereport(item, call):
                 name="failure_screenshot",
                 attachment_type=allure.attachment_type.PNG
             )
+
+def pytest_addoption(parser):
+    parser.addoption("--browser", action="store", default="chrome")

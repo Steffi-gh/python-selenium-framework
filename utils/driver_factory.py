@@ -14,21 +14,29 @@
 
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.edge.service import Service as EdgeService
 
-def get_driver():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--start-maximized")
-    
-    # Required for GitHub Actions Linux runner
-    options.add_argument("--headless=new")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+
+
+def get_driver(browser="chrome"):
+    browser = browser.lower()
+
+    # -----------------------------
+    # Common options (headless, CI)
+    # -----------------------------
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument("--headless=new")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
 
     # Disable Chrome password manager + leak detection popup
-    options.add_experimental_option("prefs", {
+    chrome_options.add_experimental_option("prefs", {
         "credentials_enable_service": False,
         "profile.password_manager_enabled": False,
         "profile.password_manager_leak_detection": False,
@@ -46,12 +54,38 @@ def get_driver():
         "profile.default_content_setting_values.password_protection": 0
     })
 
-    # Also disable Chrome's "Save password" bubble UI
-    options.add_argument("--disable-save-password-bubble")
+    chrome_options.add_argument("--disable-save-password-bubble")
+    chrome_options.add_argument("--disable-features=PasswordLeakDetection,PasswordManagerOnboarding")
 
-    # Disable Chrome Safety Check UI
-    options.add_argument("--disable-features=PasswordLeakDetection,PasswordManagerOnboarding")
+    # -----------------------------
+    # Browser selection
+    # -----------------------------
+    if browser == "chrome":
+        return webdriver.Chrome(
+            service=ChromeService(ChromeDriverManager().install()),
+            options=chrome_options
+        )
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=options)
-    return driver
+    elif browser == "firefox":
+        firefox_options = webdriver.FirefoxOptions()
+        firefox_options.add_argument("--headless")
+        firefox_options.add_argument("--width=1920")
+        firefox_options.add_argument("--height=1080")
+
+        return webdriver.Firefox(
+            service=FirefoxService(GeckoDriverManager().install()),
+            options=firefox_options
+        )
+
+    elif browser == "edge":
+        edge_options = webdriver.EdgeOptions()
+        edge_options.add_argument("--headless=new")
+        edge_options.add_argument("--start-maximized")
+
+        return webdriver.Edge(
+            service=EdgeService(EdgeChromiumDriverManager().install()),
+            options=edge_options
+        )
+
+    else:
+        raise Exception(f"Browser '{browser}' is not supported")

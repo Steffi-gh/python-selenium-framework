@@ -1,4 +1,4 @@
-name: Run Selenium Tests with Allure
+name: Run Selenium Tests with Allure (Browser Matrix)
 
 on:
   workflow_dispatch:
@@ -10,6 +10,11 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox, edge]
 
     steps:
     - name: Checkout repository
@@ -23,6 +28,13 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
+
+    # Install browsers
+    - name: Install Browsers
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y firefox
+        sudo apt-get install -y microsoft-edge-stable || true
 
      # Install Chrome
     - name: Install Google Chrome
@@ -49,10 +61,12 @@ jobs:
         sudo mv allure-2.29.0 /opt/allure
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-    - name: Run tests with Allure
-      run: pytest --alluredir=allure-results
+    # Run tests for each browser
+    - name: Run tests on ${{ matrix.browser }}
+      run: pytest --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
       continue-on-error: true
 
+   # Download previous Allure history
     - name: Download previous Allure history
       run: |
         git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
@@ -61,17 +75,16 @@ jobs:
           cp -r gh-pages/history/* allure-results/history/
         fi
 
+    # Merge browser-specific results
+    - name: Merge Allure Results
+      run: |
+        mkdir -p merged-results
+        cp -r allure-results/history merged-results/history || true
+        cp -r allure-results/*/* merged-results/ || true
+
 
     - name: Generate Allure Report
       run: allure generate allure-results -o allure-report --clean
-
-    - name: Copy history to report
-      run: |
-        if [ -d "allure-results/history" ]; then
-          mkdir -p allure-report/history
-          cp -r allure-results/history/* allure-report/history/
-        fi
-
 
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4
