@@ -76,11 +76,18 @@ jobs:
         fi
 
     # Merge browser-specific results
+
     - name: Merge Allure Results
       run: |
         mkdir -p merged-results
-        cp -r allure-results/history merged-results/history || true
-        cp -r allure-results/*/* merged-results/ || true
+        # Copy history
+        if [ -d "allure-results/history" ]; then
+          cp -r allure-results/history merged-results/history
+        fi
+        # Copy all browser results
+        cp -r allure-results/chrome/* merged-results/ || true
+        cp -r allure-results/firefox/* merged-results/ || true
+        cp -r allure-results/edge/* merged-results/ || true
 
 
     - name: Generate Allure Report
