@@ -69,22 +69,32 @@ def get_driver(browser="chrome"):
         )
 
     elif browser == "firefox":
+        from selenium.webdriver.firefox.service import Service as FirefoxService
+        from webdriver_manager.firefox import GeckoDriverManager
+
         firefox_options = webdriver.FirefoxOptions()
         firefox_options.add_argument("--headless=new")
         firefox_options.add_argument("--no-sandbox")
         firefox_options.add_argument("--disable-dev-shm-usage")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
-        # CI stability fixes
-        firefox_options.set_preference("network.proxy.type", 0)
+
+        # REQUIRED for GitHub Actions stability
         firefox_options.set_preference("browser.tabs.remote.autostart", False)
-        firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
+        firefox_options.set_preference("browser.tabs.remote.autostart.1", False)
+        firefox_options.set_preference("browser.tabs.remote.autostart.2", False)
+        firefox_options.set_preference("browser.tabs.remote.force-enable", False)
+        firefox_options.set_preference("browser.tabs.remote.separatePrivilegedContentProcess", False)
+        firefox_options.set_preference("browser.tabs.remote.separatePrivilegedJavaScriptProcess", False)
         firefox_options.set_preference("dom.ipc.processCount", 1)
+        firefox_options.set_preference("network.proxy.type", 0)
+        firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
 
         return webdriver.Firefox(
             service=FirefoxService(GeckoDriverManager().install()),
             options=firefox_options
         )
+
 
     elif browser == "edge":
         from webdriver_manager.microsoft import EdgeChromiumDriverManager
