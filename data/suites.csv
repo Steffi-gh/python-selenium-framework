@@ -1,3 +1,2 @@
 "Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","Mon Jun 29 02:52:20 UTC 2026","Mon Jun 29 02:52:24 UTC 2026","3476","tests","test_login","","","","test_valid_login",""
-"broken","Mon Jun 29 02:50:08 UTC 2026","Mon Jun 29 02:50:08 UTC 2026","0","tests","test_checkout_flow","","","","test_checkout_flow",""
+"passed","Mon Jun 29 02:58:30 UTC 2026","Mon Jun 29 03:00:30 UTC 2026","120096","","","","","","test_checkout_flow",""
