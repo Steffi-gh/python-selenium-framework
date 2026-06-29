@@ -1,10 +1,8 @@
 #This is your first working test.
-from utils.driver_factory import get_driver
 from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 
-def test_valid_login():
-    driver = get_driver()
+def test_valid_login(driver):
     driver.get("https://www.saucedemo.com")
     login = LoginPage(driver)
     login.login("standard_user", "secret_sauce")
