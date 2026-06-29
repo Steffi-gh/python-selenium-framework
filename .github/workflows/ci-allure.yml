@@ -38,15 +38,6 @@ jobs:
     - name: Install jq
       run: sudo apt-get install -y jq
 
-    # Install GeckoDriver
-    - name: Install GeckoDriver
-      run: |
-        GECKO_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | jq -r '.tag_name')
-        wget https://github.com/mozilla/geckodriver/releases/download/$GECKO_VERSION/geckodriver-$GECKO_VERSION-linux64.tar.gz
-        tar -xzf geckodriver-$GECKO_VERSION-linux64.tar.gz
-        sudo mv geckodriver /usr/bin/geckodriver
-        sudo chmod +x /usr/bin/geckodriver
-
     # Install Chrome
     - name: Install Google Chrome
       run: |
@@ -74,7 +65,12 @@ jobs:
 
     # Run tests for each browser (parallel execution)
     - name: Run tests on ${{ matrix.browser }}
-      run: pytest -n auto --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
+      run: |
+        if [ "${{ matrix.browser }}" = "firefox" ]; then
+          pytest -n 1 --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
+        else
+          pytest -n auto --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
+        fi
       continue-on-error: true
 
     # Upload per-browser Allure results

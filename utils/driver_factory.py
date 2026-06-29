@@ -43,15 +43,18 @@ def get_driver(browser: str, profile_path: str = None):
     # FIREFOX (CI-safe, stable)
     # -----------------------------
     elif browser == "firefox":
+        import os
         from selenium.webdriver.firefox.service import Service as FirefoxService
+        from webdriver_manager.firefox import GeckoDriverManager
+
+        log_path = f"/tmp/geckodriver-{os.getpid()}.log"
+        service = FirefoxService(GeckoDriverManager().install(), log_path=log_path)
 
         # Create a fresh profile per test (critical for CI stability)
         temp_profile = tempfile.mkdtemp()
         firefox_options = webdriver.FirefoxOptions()
 
-        firefox_options.add_argument("--headless=new")
-        firefox_options.add_argument("--no-sandbox")
-        firefox_options.add_argument("--disable-dev-shm-usage")
+        firefox_options.add_argument("--headless")
         firefox_options.add_argument("--width=1920")
         firefox_options.add_argument("--height=1080")
 
@@ -72,10 +75,14 @@ def get_driver(browser: str, profile_path: str = None):
         firefox_options.set_preference("browser.sessionstore.resume_from_crash", False)
 
         driver = webdriver.Firefox(
-            service=FirefoxService(GeckoDriverManager().install()),
-            options=firefox_options
+            service=service,
+            options=firefox_options,
+            # timeout increases the time to wait for the driver to start/respond
+            timeout=180
         )
 
+        # attach path so fixture/CI can upload it on failure
+        driver.geckodriver_log = log_path
         # Attach cleanup path to driver so fixture can delete it
         driver.temp_profile = temp_profile
         return driver
