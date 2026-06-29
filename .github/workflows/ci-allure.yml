@@ -35,12 +35,6 @@ jobs:
         python -m pip list | grep -i selenium || true
         python -c "import selenium; print('Selenium:', selenium.__version__)"
 
-    - name: Install Browsers
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y firefox
-        sudo apt-get install -y microsoft-edge-stable || true
-
     - name: Browser versions
       run: |
         google-chrome --version || true
