@@ -91,14 +91,6 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y microsoft-edge-stable
 
-    - name: Install EdgeDriver
-      run: |
-        EDGE_VERSION=$(microsoft-edge --version | awk '{print $3}')
-        wget https://msedgedriver.azureedge.net/$EDGE_VERSION/edgedriver_linux64.zip
-        unzip edgedriver_linux64.zip
-        sudo mv msedgedriver /usr/bin/msedgedriver
-        sudo chmod +x /usr/bin/msedgedriver
-
     # Install required Linux libraries for headless browsers
     - name: Install browser dependencies
       run: |
