@@ -1,42 +1,18 @@
-Python + Selenium + PyTest Automation Framework
-A complete, scalable UI automation framework built using Python, Selenium WebDriver, PyTest, Page Object Model (POM), Allure Reporting, and CI/CD with GitHub Actions & Azure Pipelines.
-
-🚀 Project Overview
-This framework automates the end‑to‑end UI flow of the SauceDemo sample application, including:
-
-Login
-
-Inventory validation
-
-Add to cart
-
-Checkout flow
-
-Assertions & validations
-
-Reporting & logs
-
-CI execution
-
-It is designed to demonstrate real‑world automation engineering skills, including maintainability, scalability, and CI integration.
-
-🧱 Tech Stack
-Python 3.x
-
-Selenium WebDriver
-
-PyTest
-
-Page Object Model (POM)
-
-Allure Reports
-
-GitHub Actions
-
-Azure DevOps Pipelines
-
-📁 Project Structure
-Code
+Automation Framework README
+Python Selenium Automation Framework
+A scalable UI automation framework built with Python, Selenium WebDriver, PyTest, Allure Reporting, and GitHub Actions. Supports parallel execution, multi-browser testing, and Page Object Model architecture.
+________________________________________
+Features
+•	Python + Selenium + PyTest test automation
+•	Page Object Model (POM) structure
+•	Multi-browser execution (Chrome, Firefox, Edge)
+•	Parallel execution using pytest-xdist
+•	Allure reporting with screenshots and history
+•	GitHub Actions CI/CD with browser matrix
+•	CI-safe driver factory for stable execution
+•	Automatic Allure report deployment to GitHub Pages
+________________________________________
+Project Structure
 python-selenium-framework/
 │
 ├── tests/
@@ -48,44 +24,81 @@ python-selenium-framework/
 │   ├── login_page.py
 │   ├── inventory_page.py
 │   ├── checkout_page.py
-|   ├── cart_page.py
-|
+│
 ├── utils/
 │   ├── driver_factory.py
-│   ├── logger.py
 │
-├── reports/          # pytest-html reports
-├── logs/             # Framework logs
-├── requirements.txt
+├── conftest.py
 ├── pytest.ini
+├── requirements.txt
 └── README.md
-🧪 Running Tests Locally
-1. Install dependencies
-Code
+________________________________________
+Technology Stack
+Component	Description
+Python 3.11	Programming language
+Selenium WebDriver	Browser automation
+PyTest	Test runner
+pytest-xdist	Parallel execution
+Allure	Reporting
+GitHub Actions	CI/CD pipeline
+Page Object Model	Test architecture
+________________________________________
+Running Tests
+Chrome
+pytest -n auto --browser=chrome --alluredir=allure-results/chrome
+Firefox
+pytest -n auto --browser=firefox --alluredir=allure-results/firefox
+Edge
+pytest -n auto --browser=edge --alluredir=allure-results/edge
+________________________________________
+Parallel Execution
+Parallel execution is enabled using pytest-xdist:
+pytest -n auto
+This automatically uses all available CPU cores.
+________________________________________
+Allure Reporting
+Generate report locally:
+allure generate allure-results -o allure-report --clean
+allure open allure-report
+The CI pipeline automatically:
+•	Generates per-browser results
+•	Merges results
+•	Deploys the final report to GitHub Pages
+Live report: https://steffi-gh.github.io/python-selenium-framework/
+________________________________________
+CI/CD Pipeline
+The GitHub Actions workflow:
+•	Installs Chrome, Firefox, and Edge
+•	Installs matching drivers
+•	Executes tests in parallel per browser
+•	Uploads per-browser Allure results
+•	Merges results into a unified report
+•	Deploys the report to GitHub Pages
+This demonstrates real-world CI automation practices.
+________________________________________
+Writing Tests
+Example:
+def test_valid_login(driver):
+    login = LoginPage(driver)
+    login.open()
+    login.login("standard_user", "secret_sauce")
+    assert login.is_logged_in()
+________________________________________
+Page Object Model Example
+class LoginPage(BasePage):
+    def open(self):
+        self.driver.get("https://www.saucedemo.com")
+
+    def login(self, username, password):
+        self.type("#user-name", username)
+        self.type("#password", password)
+        self.click("#login-button")
+________________________________________
+Setup
+Install dependencies:
 pip install -r requirements.txt
-2. Run all tests
-Code
-pytest
-3. Run tests with Allure
-Code
-pytest --alluredir=reports/allure-results
-allure serve reports/allure-results
-📊 Reporting
-Allure Reports
-Step‑by‑step execution
-
-Screenshots on failure
-
-Logs attached
-
-Environment metadata
-
-PyTest HTML Report
-Automatically generated via pytest.ini.
-
-🏗 CI/CD Integration
-This project supports:
-
-GitHub Actions (runs tests on every push)
-
-Azure DevOps Pipelines (runs tests on demand or per PR)
+Run tests:
+pytest -n auto --browser=chrome
+________________________________________
+Author
+Steffi QA Automation Engineer / SDET Sydney, Australia

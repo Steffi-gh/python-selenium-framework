@@ -10,7 +10,6 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
@@ -26,8 +25,7 @@ jobs:
         python-version: "3.11"
 
     - name: Install dependencies
-      run: |
-        pip install -r requirements.txt
+      run: pip install -r requirements.txt
 
     # Install browsers
     - name: Install Browsers
@@ -36,7 +34,7 @@ jobs:
         sudo apt-get install -y firefox
         sudo apt-get install -y microsoft-edge-stable || true
 
-    # Install jq (required for parsing JSON)
+    # Install jq
     - name: Install jq
       run: sudo apt-get install -y jq
 
@@ -49,16 +47,14 @@ jobs:
         sudo mv geckodriver /usr/bin/geckodriver
         sudo chmod +x /usr/bin/geckodriver
 
-
-
-     # Install Chrome
+    # Install Chrome
     - name: Install Google Chrome
       run: |
         wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         sudo apt-get update
         sudo apt-get install -y ./google-chrome-stable_current_amd64.deb
 
-    # Install ChromeDriver matching Chrome version
+    # Install ChromeDriver
     - name: Install ChromeDriver
       run: |
         CHROME_VERSION=$(google-chrome --version | sed 's/Google Chrome //')
@@ -68,7 +64,7 @@ jobs:
         sudo mv chromedriver-linux64/chromedriver /usr/bin/chromedriver
         sudo chmod +x /usr/bin/chromedriver
 
-    # Install Allure CLI (correct method for Ubuntu 24.04)
+    # Install Allure CLI
     - name: Install Allure CLI
       run: |
         wget https://github.com/allure-framework/allure2/releases/download/2.29.0/allure-2.29.0.zip
@@ -76,53 +72,68 @@ jobs:
         sudo mv allure-2.29.0 /opt/allure
         sudo ln -s /opt/allure/bin/allure /usr/bin/allure
 
-    # Run tests for each browser
+    # Run tests for each browser (parallel execution)
     - name: Run tests on ${{ matrix.browser }}
-      run: pytest --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
+      run: pytest -n auto --browser=${{ matrix.browser }} --alluredir=allure-results/${{ matrix.browser }}
       continue-on-error: true
 
-   # Download previous Allure history
+    # Upload per-browser Allure results
+    - name: Upload Allure Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-results-${{ matrix.browser }}
+        path: allure-results/${{ matrix.browser }}
+
+  merge:
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Download all browser artifacts
+    - name: Download Allure Results
+      uses: actions/download-artifact@v4
+      with:
+        path: merged-results
+
+    # Download previous history
     - name: Download previous Allure history
       run: |
         git clone --branch gh-pages https://github.com/${{ github.repository }} gh-pages
         if [ -d "gh-pages/history" ]; then
-          mkdir -p allure-results/history
-          cp -r gh-pages/history/* allure-results/history/
+          mkdir -p merged-results/history
+          cp -r gh-pages/history/* merged-results/history/
         fi
 
-    # Merge browser-specific results
-
+    # Merge all browser results dynamically
     - name: Merge Allure Results
       run: |
-        mkdir -p merged-results
+        mkdir -p final-results
         # Copy history
-        if [ -d "allure-results/history" ]; then
-          cp -r allure-results/history merged-results/history
+        if [ -d "merged-results/history" ]; then
+          cp -r merged-results/history final-results/history
         fi
-        # Copy all browser results
-        cp -r allure-results/chrome/* merged-results/ || true
-        cp -r allure-results/firefox/* merged-results/ || true
-        cp -r allure-results/edge/* merged-results/ || true
+        # Merge all browser folders
+        for dir in merged-results/*; do
+          cp -r "$dir"/* final-results/ || true
+        done
 
-
+    # Generate final Allure report
     - name: Generate Allure Report
-      run: allure generate merged-results -o allure-report --clean
+      run: allure generate final-results -o allure-report --clean
 
+    # Upload final report
     - name: Upload Allure Report Artifact
       uses: actions/upload-artifact@v4
       with:
         name: allure-report
         path: allure-report
 
-    - name: Copy categories.json
-      run: |
-        mkdir -p allure-results
-        cp allure/categories.json allure-results/categories.json
-
-
   deploy:
     runs-on: ubuntu-latest
-    needs: tests   # waits for all browser jobs to finish
+    needs: merge
 
     steps:
       - name: Checkout repository
@@ -140,4 +151,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: allure-report
           publish_branch: gh-pages
-          
