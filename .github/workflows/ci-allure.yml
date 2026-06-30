@@ -115,7 +115,14 @@ jobs:
 
     # FIX: Pass the wild-card directory path so Allure processes all browser folders safely
     - name: Generate Final Merged Allure Report
-      run: allure generate final-results-merged/* -o allure-report --clean
+      run: allure generate final-results-merged/allure-results-* -o allure-report --clean
+
+    - name: Copy history into final report
+      run: |
+        if [ -d "final-results-merged/history" ]; then
+          mkdir -p allure-report/history
+          cp -r final-results-merged/history/* allure-report/history/
+        fi
 
     # Upload final report
     - name: Upload Allure Report Artifact
