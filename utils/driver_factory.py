@@ -1,7 +1,7 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as FirefoxService
-
+from selenium.webdriver.remote.client_config import ClientConfig
 
 def _chrome_options():
     options = webdriver.ChromeOptions()
@@ -64,14 +64,21 @@ def get_driver(browser: str):
 
     elif browser == "firefox":
 
-        service = FirefoxService(
-            log_output="geckodriver.log"
+        client_config = ClientConfig(
+            connection_timeout=180,   # time to wait for geckodriver to start Firefox
+            read_timeout=180          # time to wait for commands
         )
-        service.service_args = ["--log", "debug"]
+        service = FirefoxService(
+            log_output="geckodriver.log",
+            service_args=["--log", "debug"]
+        )
+        
+        service.env = os.environ.copy()
 
         driver = webdriver.Firefox(
             service=service,
-            options=_firefox_options()
+            options=_firefox_options(),
+            client_config=client_config
         )
 
     elif browser == "edge":
@@ -81,7 +88,5 @@ def get_driver(browser: str):
 
     else:
         raise ValueError(f"Unsupported browser: {browser}")
-
-    
 
     return driver
