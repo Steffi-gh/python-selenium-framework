@@ -85,6 +85,12 @@ jobs:
       run: |
         mkdir -p final-results-merged
         
+        # Copy the history trend data into the staging area root if it exists
+        if [ -d "final-results/history" ]; then
+          mkdir -p final-results-merged/history
+          cp -r final-results/history/* final-results-merged/history/
+        fi
+
         for dir in merged-results/allure-results-*; do
           if [ -d "$dir" ]; then
             BROWSER_NAME=$(basename "$dir" | sed 's/allure-results-//')
@@ -98,12 +104,6 @@ jobs:
             cp -r "$dir" final-results-merged/
           fi
         done
-
-        # Copy the history trend data into the staging area root if it exists
-        if [ -d "final-results/history" ]; then
-          mkdir -p final-results-merged/history
-          cp -r final-results/history/* final-results-merged/history/
-        fi
 
     # Install Allure CLI on this runner machine
     - name: Install Allure CLI
