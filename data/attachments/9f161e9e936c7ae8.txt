@@ -1,0 +1,11 @@
+2026-06-30 13:58:34,819 - INFO - Typing into element: ('id', 'user-name') -> standard_user
+2026-06-30 13:58:35,208 - INFO - Typing into element: ('id', 'password') -> secret_sauce
+2026-06-30 13:58:35,581 - INFO - Clicking element: ('id', 'login-button')
+2026-06-30 13:58:36,176 - INFO - Clicking element: ('id', 'add-to-cart-sauce-labs-backpack')
+2026-06-30 13:58:36,360 - INFO - Clicking element: ('class name', 'shopping_cart_link')
+2026-06-30 13:58:36,528 - INFO - Clicking element: ('id', 'checkout')
+2026-06-30 13:58:36,668 - INFO - Typing into element: ('id', 'first-name') -> Steffi
+2026-06-30 13:58:36,799 - INFO - Typing into element: ('id', 'last-name') -> QA
+2026-06-30 13:58:36,933 - INFO - Typing into element: ('id', 'postal-code') -> 2000
+2026-06-30 13:58:37,066 - INFO - Clicking element: ('id', 'continue')
+2026-06-30 13:58:37,238 - INFO - Clicking element: ('id', 'finish')

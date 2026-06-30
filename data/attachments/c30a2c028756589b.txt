@@ -1,2 +1,0 @@
-Attempt 1 failed: ClientConfig.__init__() got an unexpected keyword argument 'connection_timeout'
-Attempt 2 failed: ClientConfig.__init__() got an unexpected keyword argument 'connection_timeout'
