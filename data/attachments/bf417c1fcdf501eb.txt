@@ -1,0 +1,2 @@
+2026-06-30 14:12:46,564 - INFO - Typing into element: ('id', 'user-name') -> standard_user
+2026-06-30 14:12:46,889 - INFO - Typing into element: ('id', 'password') -> secret_sauce
