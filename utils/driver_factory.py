@@ -1,7 +1,6 @@
 import os
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as FirefoxService
-from selenium.webdriver.remote.client_config import ClientConfig
 
 def _chrome_options():
     options = webdriver.ChromeOptions()
@@ -33,11 +32,14 @@ def _firefox_options():
     options = webdriver.FirefoxOptions()
 
     options.add_argument("-headless")
-
     options.set_preference("remote.active-protocols", 1)
-
     options.add_argument("--width=1920")
     options.add_argument("--height=1080")
+
+    # Firefox stability preferences for CI
+    options.set_preference("network.http.connection-timeout", 180)
+    options.set_preference("browser.sessionstore.resume_from_crash", False)
+    options.set_preference("dom.ipc.processCount", 1)
 
     return options
 
@@ -64,10 +66,6 @@ def get_driver(browser: str):
 
     elif browser == "firefox":
 
-        client_config = ClientConfig(
-            connection_timeout=180,   # time to wait for geckodriver to start Firefox
-            read_timeout=180          # time to wait for commands
-        )
         service = FirefoxService(
             log_output="geckodriver.log",
             service_args=["--log", "debug"]
@@ -77,9 +75,12 @@ def get_driver(browser: str):
 
         driver = webdriver.Firefox(
             service=service,
-            options=_firefox_options(),
-            client_config=client_config
+            options=_firefox_options()
+           
         )
+
+        driver.set_page_load_timeout(120)
+        driver.implicitly_wait(5)
 
     elif browser == "edge":
         driver = webdriver.Edge(
