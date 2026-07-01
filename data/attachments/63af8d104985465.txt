@@ -1,0 +1,12 @@
+2026-07-01 23:18:14,297 - INFO - Typing into element: ('id', 'user-name') -> standard_user
+2026-07-01 23:18:14,729 - INFO - Typing into element: ('id', 'password') -> secret_sauce
+2026-07-01 23:18:14,921 - INFO - Clicking element: ('id', 'login-button')
+2026-07-01 23:18:15,446 - INFO - Clicking element: ('id', 'add-to-cart-sauce-labs-backpack')
+2026-07-01 23:18:15,636 - INFO - Clicking element: ('class name', 'shopping_cart_link')
+2026-07-01 23:18:15,800 - INFO - Clicking element: ('id', 'checkout')
+2026-07-01 23:18:15,956 - INFO - Typing into element: ('id', 'first-name') -> Steffi
+2026-07-01 23:18:16,089 - INFO - Typing into element: ('id', 'last-name') -> QA
+2026-07-01 23:18:16,208 - INFO - Typing into element: ('id', 'postal-code') -> 2000
+2026-07-01 23:18:16,323 - INFO - Clicking element: ('id', 'continue')
+2026-07-01 23:18:16,595 - INFO - Clicking element: ('id', 'finish')
+2026-07-01 23:18:16,811 - INFO - Getting text from element: ('class name', 'complete-header')
