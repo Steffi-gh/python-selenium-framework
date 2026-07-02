@@ -1,6 +1,0 @@
-INFO     automation:base_page.py:45 Typing into element: ('id', 'user-name') -> standard_user
-INFO     automation:base_page.py:45 Typing into element: ('id', 'password') -> secret_sauce
-INFO     automation:base_page.py:31 Clicking element: ('id', 'login-button')
-WARNING  urllib3.connectionpool:connectionpool.py:869 Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=42537): Failed to establish a new connection: [Errno 111] Connection refused")': /session/5162e21f-1dde-4d43-87c7-7aa20a64f7b0
-WARNING  urllib3.connectionpool:connectionpool.py:869 Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=42537): Failed to establish a new connection: [Errno 111] Connection refused")': /session/5162e21f-1dde-4d43-87c7-7aa20a64f7b0
-WARNING  urllib3.connectionpool:connectionpool.py:869 Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError("HTTPConnection(host='localhost', port=42537): Failed to establish a new connection: [Errno 111] Connection refused")': /session/5162e21f-1dde-4d43-87c7-7aa20a64f7b0
